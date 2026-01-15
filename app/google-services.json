@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "199597987814",
+    "project_id": "billards-181e6",
+    "storage_bucket": "billards-181e6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:199597987814:android:bc5a26c86518e73aff6827",
+        "android_client_info": {
+          "package_name": "com.example.billards"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-oewP4pHxIPt_GJvAv5cC4qYP0ZtbqSo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

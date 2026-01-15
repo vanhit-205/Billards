@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Activities.LoginScreen">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="100dp"
+        android:text="Đăng nhập"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="40sp"
+        android:textStyle="bold" />
+
+
+    <TextView
+        android:id="@+id/textview"
+        android:paddingTop="40dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textColor="#2196F3" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        > <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/edtemail"
+        android:layout_width="300dp"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_edt_login"
+        android:hint="Email"
+        android:inputType="text" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <View
+        android:id="@+id/view3"
+        android:layout_width="match_parent"
+        android:layout_height="15dp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:passwordToggleEnabled="true"
+        app:passwordToggleTint="#000000"> <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/edtpass"
+        android:layout_width="300dp"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_edt_login"
+        android:hint="Password"
+        android:inputType="textPassword" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/btnlogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/custom_btn_login"
+        app:backgroundTint ="@null"
+        android:layout_gravity="center"
+        android:text="Đăng nhập" />
+
+</LinearLayout>
