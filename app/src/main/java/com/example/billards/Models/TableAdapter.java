@@ -1,6 +1,8 @@
 package com.example.billards.Models;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.billards.R;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
@@ -24,67 +25,78 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
     private List<BillardTable> tableList;
     private Context context;
 
-    public TableAdapter(List<BillardTable> tableList,Context context){
-        this.tableList=tableList;
-        this.context=context;
+    private Handler timeHandler = new Handler(Looper.getMainLooper());
+    private FirebaseFirestore db = FirebaseFirestore.getInstance(); // Khởi tạo dùng chung
+
+    public TableAdapter(List<BillardTable> tableList, Context context){
+        this.tableList = tableList;
+        this.context = context;
     }
+
     @NonNull
     @Override
     public TableViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view =LayoutInflater.from(context).inflate(R.layout.fragment_item_table,parent,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.fragment_item_table, parent, false);
         return new TableViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TableViewHolder holder, int position) {
-        BillardTable table=tableList.get(position);
+        BillardTable table = tableList.get(position);
 
         holder.tvTableNumber.setText(String.valueOf(table.getnumber()));
+
+        timeHandler.removeCallbacks(holder.updateTimerRunnable);
 
         if(table.getisPlaying()){
             holder.btnStart.setText("Tính tiền");
             holder.btnStart.setBackgroundTintList(context.getResources().getColorStateList(android.R.color.holo_red_dark));
 
-            long diff = System.currentTimeMillis() - table.getStartTime();
-            holder.tvPlayTime.setText(formatTime(diff));
-        }   else{
+            holder.updateTimerRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    long diff = System.currentTimeMillis() - table.getStartTime();
+                    holder.tvPlayTime.setText(formatTime(diff));
+                    timeHandler.postDelayed(this, 1000); // Lặp lại sau mỗi 1 giây
+                }
+            };
+            timeHandler.post(holder.updateTimerRunnable);
+        } else {
             holder.btnStart.setText("Bắt đầu");
             holder.btnStart.setBackgroundTintList(context.getResources().getColorStateList(android.R.color.holo_blue_light));
             holder.tvPlayTime.setText("00:00:00");
         }
 
-        holder.btnStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Tables").child(table.getId());
-                if (!table.getisPlaying()) {
-                    dbRef.child("isPlaying").setValue(true);
-                    dbRef.child("startTime").setValue(System.currentTimeMillis());
-                    Toast.makeText(context, "Đã bắt đầu bàn " + table.getnumber(), Toast.LENGTH_SHORT).show();
-                } else {
-                    payment(table, dbRef);
-                }
+        holder.btnStart.setOnClickListener(view -> {
+            DocumentReference tableRef = db.collection("table").document(table.getId());
+            if (!table.getisPlaying()) {
+                tableRef.update("isPlaying", true, "startTime", System.currentTimeMillis())
+                        .addOnSuccessListener(aVoid -> Toast.makeText(context, "Bắt đầu bàn " + table.getnumber(), Toast.LENGTH_SHORT).show());
+            } else {
+                payment(table, tableRef);
             }
         });
-
     }
 
     private String formatTime(long millis){
-        int seconds=(int) ((millis/1000)%60);
-        int minutes=(int) ((millis/1000*60)%60);
-        int hours=(int) ((millis/1000*60*60));
+        long seconds = (millis / 1000) % 60;
+        long minutes = (millis / (1000 * 60)) % 60;
+        long hours   = (millis / (1000 * 60 * 60));
         return String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, seconds);
     }
 
-    private void payment(BillardTable table, DatabaseReference  dbRef){
-        long time= System.currentTimeMillis()-table.getStartTime();
-        long hours=time/(1000*60*60);
-        double total=(int)hours*50000;
+    private void payment(BillardTable table, DocumentReference tableRef){
+        long diff = System.currentTimeMillis() - table.getStartTime();
 
-        Toast.makeText(context, "Bàn " + table.getnumber() + " thanh toán: " + Math.round(total) + "đ", Toast.LENGTH_LONG).show();
+        double minutes = diff / (1000.0 * 60);
+        double pricePerMinute = 50000.0 / 60.0;
+        long total = (long) (minutes * pricePerMinute);
 
-        dbRef.child("isPlaying").setValue(false);
-        dbRef.child("startTime").setValue(0);
+        String msg = "Bàn " + table.getnumber() + " chơi " + Math.round(minutes) + " phút. Tổng: " + total + "đ";
+
+
+        tableRef.update("isPlaying", false, "startTime", 0)
+                .addOnSuccessListener(aVoid -> Toast.makeText(context, msg, Toast.LENGTH_LONG).show());
     }
 
     @Override
@@ -92,9 +104,14 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         return tableList != null ? tableList.size() : 0;
     }
 
+    public void stopAllTimers() {
+        timeHandler.removeCallbacksAndMessages(null);
+    }
     public static class TableViewHolder extends RecyclerView.ViewHolder {
         TextView tvTableNumber, tvPlayTime;
         Button btnStart;
+
+        Runnable updateTimerRunnable;
 
         public TableViewHolder(@NonNull View itemView) {
             super(itemView);

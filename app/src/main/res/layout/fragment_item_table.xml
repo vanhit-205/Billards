@@ -10,10 +10,10 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center_vertical">
+        android:padding="12dp">
 
         <TextView
             android:id="@+id/tvTableNumber"
@@ -29,35 +29,35 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="15dp">
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Thời gian đã chơi:"
-                android:textSize="13sp"
-                android:textColor="#666666"/>
+                android:textColor="#666666"
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/tvPlayTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="00:00:00"
+                android:textColor="#E91E63"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#E91E63"/>
+                android:textStyle="bold" />
         </LinearLayout>
 
         <Button
             android:id="@+id/btnStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bắt đầu"
-            android:textSize="12sp"
             android:backgroundTint="#4CAF50"
-            android:textColor="@android:color/white"/>
+            android:text="Bắt đầu"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

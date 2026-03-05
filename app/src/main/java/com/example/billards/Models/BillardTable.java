@@ -23,4 +23,20 @@ public class BillardTable {
     public long getStartTime() {
         return startTime;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setPlaying(boolean playing) {
+        isPlaying = playing;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
 }
