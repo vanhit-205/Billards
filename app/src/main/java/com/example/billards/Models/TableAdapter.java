@@ -63,7 +63,8 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
             timeHandler.post(holder.updateTimerRunnable);
         } else {
             holder.btnStart.setText("Bắt đầu");
-            holder.btnStart.setBackgroundTintList(context.getResources().getColorStateList(android.R.color.holo_blue_light));
+            holder.btnStart.setBackgroundTintList(null);
+            holder.btnStart.setBackgroundResource(R.drawable.custom_btn_login);
             holder.tvPlayTime.setText("00:00:00");
         }
 
@@ -87,16 +88,35 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
 
     private void payment(BillardTable table, DocumentReference tableRef){
         long diff = System.currentTimeMillis() - table.getStartTime();
-
         double minutes = diff / (1000.0 * 60);
-        double pricePerMinute = 50000.0 / 60.0;
+        double pricePerMinute = 50000.0 / 60.0; // 50k/h
         long total = (long) (minutes * pricePerMinute);
 
-        String msg = "Bàn " + table.getnumber() + " chơi " + Math.round(minutes) + " phút. Tổng: " + total + "đ";
+        // Định dạng tiền tệ VNĐ
+        java.text.NumberFormat formatter = java.text.NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        String totalStr = formatter.format(total);
 
+        String msg = "Bàn " + table.getnumber() + " đã chơi " + (int)minutes + " phút.\nTổng thanh toán: " + totalStr;
 
-        tableRef.update("isPlaying", false, "startTime", 0)
-                .addOnSuccessListener(aVoid -> Toast.makeText(context, msg, Toast.LENGTH_LONG).show());
+        // Hiển thị Dialog xác nhận thay vì Toast ngay lập tức
+        new androidx.appcompat.app.AlertDialog.Builder(context)
+                .setTitle("Thanh toán")
+                .setMessage(msg)
+                .setPositiveButton("Xác nhận", (dialog, which) -> {
+                    DocumentReference paymentRef = db.collection("payments").document();
+                    Payment payment = new Payment(paymentRef.getId(), table.getnumber(), System.currentTimeMillis(), diff, total);
+                    paymentRef.set(payment)
+                            .addOnSuccessListener(aVoid -> {
+                                // 4. Sau khi lưu hóa đơn thành công thì reset trạng thái bàn
+                                tableRef.update("isPlaying", false, "startTime", 0)
+                                        .addOnSuccessListener(unused -> Toast.makeText(context, " Đã thanh toán và lưu hóa đơn", Toast.LENGTH_SHORT).show());
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(context, "Lỗi khi lưu hóa đơn: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 
     @Override

@@ -50,7 +50,9 @@ public class PaymentFragment extends Fragment {
 
         tableList = new ArrayList<>();
 
-        rvTablesPayment.setLayoutManager(new LinearLayoutManager(getContext()));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+
+        rvTablesPayment.setLayoutManager(gridLayoutManager);
 
 
         adapter = new TableAdapter(tableList, getContext());
