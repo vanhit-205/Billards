@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.billards.R;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
@@ -31,6 +32,19 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
     public TableAdapter(List<BillardTable> tableList, Context context){
         this.tableList = tableList;
         this.context = context;
+        setupFirestoreListener();
+    }
+
+    private void setupFirestoreListener() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("orders").addSnapshotListener((snapshot, e) -> {
+            if (e != null) {
+                return;
+            }
+            if (snapshot != null && !snapshot.isEmpty()) {
+                notifyDataSetChanged(); // Refresh adapter on order changes
+            }
+        });
     }
 
     @NonNull
@@ -90,33 +104,55 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         long diff = System.currentTimeMillis() - table.getStartTime();
         double minutes = diff / (1000.0 * 60);
         double pricePerMinute = 50000.0 / 60.0; // 50k/h
-        long total = (long) (minutes * pricePerMinute);
+        long timeTotal = (long) (minutes * pricePerMinute);
 
-        // Định dạng tiền tệ VNĐ
-        java.text.NumberFormat formatter = java.text.NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-        String totalStr = formatter.format(total);
+        // Fetch orders for this table and calculate orders total
+        db.collection("orders")
+                .whereEqualTo("tableID", table.getnumber())
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    long ordersTotal = 0;
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        int price = doc.getLong("price").intValue();
+                        int quantity = doc.getLong("quantity").intValue();
+                        ordersTotal += (long) price * quantity;
+                    }
 
-        String msg = "Bàn " + table.getnumber() + " đã chơi " + (int)minutes + " phút.\nTổng thanh toán: " + totalStr;
+                    long total = timeTotal + ordersTotal;
 
-        // Hiển thị Dialog xác nhận thay vì Toast ngay lập tức
-        new androidx.appcompat.app.AlertDialog.Builder(context)
-                .setTitle("Thanh toán")
-                .setMessage(msg)
-                .setPositiveButton("Xác nhận", (dialog, which) -> {
-                    DocumentReference paymentRef = db.collection("payments").document();
-                    Payment payment = new Payment(paymentRef.getId(), table.getnumber(), System.currentTimeMillis(), diff, total);
-                    paymentRef.set(payment)
-                            .addOnSuccessListener(aVoid -> {
-                                // 4. Sau khi lưu hóa đơn thành công thì reset trạng thái bàn
-                                tableRef.update("isPlaying", false, "startTime", 0)
-                                        .addOnSuccessListener(unused -> Toast.makeText(context, " Đã thanh toán và lưu hóa đơn", Toast.LENGTH_SHORT).show());
+                    java.text.NumberFormat formatter = java.text.NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+                    String totalStr = formatter.format(total);
+                    String timeTotalStr = formatter.format(timeTotal);
+                    String ordersTotalStr = formatter.format(ordersTotal);
+
+                    String msg = "Bàn " + table.getnumber() + " đã chơi " + (int)minutes + " phút.\n" +
+                                 "Tiền bàn: " + timeTotalStr + "\n" +
+                                 "Tiền sản phẩm: " + ordersTotalStr + "\n" +
+                                 "Tổng thanh toán: " + totalStr;
+
+                    new androidx.appcompat.app.AlertDialog.Builder(context)
+                            .setTitle("Thanh toán")
+                            .setMessage(msg)
+                            .setPositiveButton("Xác nhận", (dialog, which) -> {
+                                DocumentReference paymentRef = db.collection("payments").document();
+                                Payment payment = new Payment(paymentRef.getId(), table.getnumber(), System.currentTimeMillis(), diff, total);
+                                paymentRef.set(payment)
+                                        .addOnSuccessListener(aVoid -> {
+                                            // Reset table status
+                                            tableRef.update("isPlaying", false, "startTime", 0)
+                                                    .addOnSuccessListener(unused -> Toast.makeText(context, " Đã thanh toán và lưu hóa đơn", Toast.LENGTH_SHORT).show());
+                                            // Optionally, delete or mark orders as paid here
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(context, "Lỗi khi lưu hóa đơn: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        });
                             })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(context, "Lỗi khi lưu hóa đơn: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            });
+                            .setNegativeButton("Hủy", null)
+                            .show();
                 })
-                .setNegativeButton("Hủy", null)
-                .show();
+                .addOnFailureListener(e -> {
+                    Toast.makeText(context, "Lỗi khi lấy đơn hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override

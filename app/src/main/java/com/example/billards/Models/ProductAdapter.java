@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.billards.Fragment.OrderFragment;
 import com.example.billards.R;
 
 import java.text.NumberFormat;
@@ -22,10 +23,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     private List<Product> productList;
     private Context context;
+    private OrderFragment orderFragment;
 
-    public ProductAdapter(List<Product> productList, Context context) {
+    public ProductAdapter(List<Product> productList, Context context, OrderFragment orderFragment) {
         this.productList = productList;
         this.context = context;
+        this.orderFragment = orderFragment;
     }
 
     @NonNull
@@ -40,15 +43,30 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         Product product = productList.get(position);
 
         holder.tvProductName.setText(product.getName());
-        
+
         NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
         holder.tvProductPrice.setText(formatter.format(product.getPrice()));
-        
+
 
         holder.imgProduct.setImageResource(product.getImageResId());
 
-        holder.btnOrderProduct.setOnClickListener(v -> {
-            Toast.makeText(context, "Đã thêm " + product.getName() + " vào đơn hàng", Toast.LENGTH_SHORT).show();
+        holder.btnMinus.setOnClickListener(view -> {
+            int quantity = Integer.parseInt(holder.tvQuantity.getText().toString());
+            if (quantity > 1) {
+                quantity--;
+                holder.tvQuantity.setText(String.valueOf(quantity));
+            }
+        });
+        holder.btnAdd.setOnClickListener(view -> {
+            int quantity = Integer.parseInt(holder.tvQuantity.getText().toString());
+                quantity++;
+                holder.tvQuantity.setText(String.valueOf(quantity));
+        });
+
+        holder.btnOrder.setOnClickListener(v -> {
+            int quantity = Integer.parseInt(holder.tvQuantity.getText().toString());
+            orderFragment.addToCart(product, quantity);
+            holder.tvQuantity.setText("1"); // Reset quantity
         });
     }
 
@@ -60,14 +78,20 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
         ImageView imgProduct;
         TextView tvProductName, tvProductPrice;
-        Button btnOrderProduct;
+        Button btnOrder;
+        TextView btnMinus, btnAdd;
+        TextView tvQuantity;
+
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
             imgProduct = itemView.findViewById(R.id.imgProduct);
             tvProductName = itemView.findViewById(R.id.tvProductName);
             tvProductPrice = itemView.findViewById(R.id.tvProductPrice);
-            btnOrderProduct = itemView.findViewById(R.id.btnOrder);
+            btnOrder = itemView.findViewById(R.id.btnOrder);
+            btnMinus = itemView.findViewById(R.id.btnMinus);
+            btnAdd = itemView.findViewById(R.id.btnAdd);
+            tvQuantity = itemView.findViewById(R.id.tvQuantity);
         }
     }
 }

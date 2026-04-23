@@ -5,9 +5,8 @@ plugins {
 
 android {
     namespace = "com.example.billards"
-    compileSdk {
-        version = release(36)
-    }
+    // Cập nhật lên 36 để tương thích với các thư viện AndroidX mới nhất
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.billards"

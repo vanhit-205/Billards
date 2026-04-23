@@ -1,5 +1,6 @@
 package com.example.billards.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -29,13 +30,29 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        Users currentUser =UserSession.getInstance().getUser();
-        if("staff".equals(currentUser.getRole())){
+
+        Users currentUser = UserSession.getInstance().getUser();
+
+        // Kiểm tra nếu session không tồn tại (tránh crash ứng dụng)
+        if (currentUser == null) {
+            Toast.makeText(this, "Phiên làm việc hết hạn, vui lòng đăng nhập lại!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, LoginScreen.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+        // Phân quyền dựa trên Role
+        if ("staff".equals(currentUser.getRole())) {
             loadFragment(new StaffFragment());
         } else if ("admin".equals(currentUser.getRole())) {
             loadFragment(new AdminFragment());
+        } else {
+            Toast.makeText(this, "Tài khoản không có quyền truy cập!", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
+
     private void loadFragment(Fragment fragment){
         getSupportFragmentManager()
                 .beginTransaction()
