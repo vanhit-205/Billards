@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <RadioGroup
+        android:id="@+id/rgFilter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
+        <RadioButton
+            android:id="@+id/rbDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Theo Ngày"
+            android:checked="true" />
+        <RadioButton
+            android:id="@+id/rbMonth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:text="Theo Tháng" />
+    </RadioGroup>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_marginBottom="16dp"
+        android:elevation="4dp">
+        <!-- Placeholder cho Biểu đồ (Nếu chưa có MPAndroidChart thì dùng TextView tạm) -->
+        <TextView
+            android:id="@+id/tvChartPlaceholder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Biểu đồ doanh thu\n(MPAndroidChart)"
+            android:background="#EEEEEE"/>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tổng doanh thu:"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tvTotalRevenue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0đ"
+        android:textColor="@color/black"
+        android:textSize="32sp"
+        android:textStyle="bold" />
+
+</LinearLayout>
