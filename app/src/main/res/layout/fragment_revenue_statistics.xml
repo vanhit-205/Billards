@@ -28,17 +28,16 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="300dp"
         android:layout_marginBottom="16dp"
         android:elevation="4dp">
-        <!-- Placeholder cho Biểu đồ (Nếu chưa có MPAndroidChart thì dùng TextView tạm) -->
-        <TextView
-            android:id="@+id/tvChartPlaceholder"
+        
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/barChart"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="Biểu đồ doanh thu\n(MPAndroidChart)"
-            android:background="#EEEEEE"/>
+            android:padding="8dp"/>
+            
     </androidx.cardview.widget.CardView>
 
     <TextView
