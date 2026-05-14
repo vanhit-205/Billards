@@ -1,46 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    tools:context=".Fragment.StaffFragment">
+    android:background="@color/background"
+    android:orientation="vertical">
 
-    <!-- TODO: Update blank fragment layout -->
-
-    <TextView
-        android:id="@+id/tvname"
+    <!-- Phần tiêu đề vẫn giữ style Admin nhưng bỏ padding ngoài -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        android:layout_marginLeft="5dp"
-        android:textAlignment="viewStart"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@color/white">
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tablayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:tabIconTint="@color/black"
-        app:tabSelectedTextColor="@color/black">
-
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/tvStaffTitle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:icon="@drawable/order"
-            android:text="Oder" />
+            android:layout_marginBottom="16dp"
+            android:text="Nhân Viên"
+            android:textColor="@color/foreground"
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="wrap_content"
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/staffTabLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:icon="@drawable/payment"
-            android:text="Payment" />
-    </com.google.android.material.tabs.TabLayout>
+            android:background="@color/white"
+            app:tabIndicatorColor="@color/blue_600"
+            app:tabIndicatorHeight="2dp"
+            app:tabSelectedTextColor="@color/blue_600"
+            app:tabTextColor="@color/muted_foreground"
+            app:tabRippleColor="@android:color/transparent"
+            app:tabTextAppearance="@style/TabTextAppearance"
+            app:tabIconTint="@color/tab_icon_selector">
 
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/payment"
+                android:text="Thanh toán" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/order"
+                android:text="Order" />
+        </com.google.android.material.tabs.TabLayout>
+    </LinearLayout>
+
+    <!-- ViewPager2 chiếm toàn bộ phần còn lại -->
     <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/pager"
+        android:id="@+id/staffViewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />

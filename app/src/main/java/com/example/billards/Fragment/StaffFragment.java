@@ -3,13 +3,6 @@ package com.example.billards.Fragment;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +10,12 @@ import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.billards.Activities.LoginScreen;
 import com.example.billards.Models.UserSession;
@@ -29,37 +28,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class StaffFragment extends Fragment {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
-
-    TabLayout tab_layout;
-    ViewPager2 pager;
-    ViewPagerFragmentAdapter adapter;
-    TextView tvname;
+    private TabLayout tabLayout;
+    private ViewPager2 viewPager;
+    private StaffPagerAdapter adapter;
+    private TextView tvStaffTitle;
 
     public StaffFragment() {
         // Required empty public constructor
-    }
-
-    public static StaffFragment newInstance(String param1, String param2) {
-        StaffFragment fragment = new StaffFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -71,19 +46,19 @@ public class StaffFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        tvname = view.findViewById(R.id.tvname);
+
+        tvStaffTitle = view.findViewById(R.id.tvStaffTitle);
+        tabLayout = view.findViewById(R.id.staffTabLayout);
+        viewPager = view.findViewById(R.id.staffViewPager);
 
         updateStaffName();
 
-        tvname.setOnClickListener(v -> showPopupMenu());
+        tvStaffTitle.setOnClickListener(v -> showPopupMenu());
 
-        tab_layout = view.findViewById(R.id.tablayout);
-        pager = view.findViewById(R.id.pager);
-        adapter = new ViewPagerFragmentAdapter(this, tab_layout.getTabCount());
-        pager.setAdapter(adapter);
-        pager.setOffscreenPageLimit(2);
+        adapter = new StaffPagerAdapter(this);
+        viewPager.setAdapter(adapter);
 
-        new TabLayoutMediator(tab_layout, pager, ((tab, position) -> {
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
                 case 0:
                     tab.setText("Thanh toán");
@@ -94,18 +69,20 @@ public class StaffFragment extends Fragment {
                     tab.setIcon(R.drawable.order);
                     break;
             }
-        })).attach();
+        }).attach();
     }
 
     private void updateStaffName() {
         Users currentUser = UserSession.getInstance().getUser();
         if (currentUser != null) {
-            tvname.setText("Nhân viên: " + currentUser.getName());
+            tvStaffTitle.setText("Nhân Viên: " + currentUser.getName());
+        } else {
+            tvStaffTitle.setText("Nhân Viên");
         }
     }
 
     private void showPopupMenu() {
-        PopupMenu popup = new PopupMenu(getContext(), tvname);
+        PopupMenu popup = new PopupMenu(getContext(), tvStaffTitle);
         popup.getMenuInflater().inflate(R.menu.account_menu, popup.getMenu());
 
         popup.setOnMenuItemClickListener(item -> {
@@ -174,27 +151,23 @@ public class StaffFragment extends Fragment {
         }
     }
 
-    public static class ViewPagerFragmentAdapter extends FragmentStateAdapter {
-
-        int size;
-
-        public ViewPagerFragmentAdapter(@NonNull Fragment fragment, int size) {
+    private static class StaffPagerAdapter extends FragmentStateAdapter {
+        public StaffPagerAdapter(@NonNull Fragment fragment) {
             super(fragment);
-            this.size = size;
         }
 
         @NonNull
         @Override
         public Fragment createFragment(int position) {
-            if (position == 1) {
-                return new OrderFragment();
+            if (position == 0) {
+                return new PaymentFragment();
             }
-            return new PaymentFragment();
+            return new OrderFragment();
         }
 
         @Override
         public int getItemCount() {
-            return size;
+            return 2;
         }
     }
 }
