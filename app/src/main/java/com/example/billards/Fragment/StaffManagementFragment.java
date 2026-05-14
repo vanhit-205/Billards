@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.billards.Models.StaffAdapter;
 import com.example.billards.Models.Users;
 import com.example.billards.R;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -30,6 +31,7 @@ public class StaffManagementFragment extends Fragment {
 
     private RecyclerView rvStaff;
     private FloatingActionButton fabAddStaff;
+    private MaterialButton btnAddStaff;
     private StaffAdapter adapter;
     private List<Users> staffList;
     private FirebaseFirestore db;
@@ -48,6 +50,7 @@ public class StaffManagementFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         rvStaff = view.findViewById(R.id.rvStaff);
         fabAddStaff = view.findViewById(R.id.fabAddStaff);
+        btnAddStaff = view.findViewById(R.id.btnAddStaff);
 
         staffList = new ArrayList<>();
         adapter = new StaffAdapter(staffList, this::showDeleteConfirmDialog);
@@ -56,7 +59,9 @@ public class StaffManagementFragment extends Fragment {
 
         loadStaffList();
 
-        fabAddStaff.setOnClickListener(v -> showAddStaffDialog());
+        View.OnClickListener addStaffListener = v -> showAddStaffDialog();
+        if (btnAddStaff != null) btnAddStaff.setOnClickListener(addStaffListener);
+        if (fabAddStaff != null) fabAddStaff.setOnClickListener(addStaffListener);
     }
 
     private void loadStaffList() {
@@ -102,9 +107,6 @@ public class StaffManagementFragment extends Fragment {
     }
 
     private void createStaffAccount(String name, String email, String password) {
-        // Lưu ý: Việc tạo user mới sẽ tự động đăng nhập user đó. 
-        // Trong thực tế Admin nên dùng Firebase Admin SDK hoặc một Cloud Function.
-        // Ở mức độ client, sau khi tạo xong ta cần sign out và sign in lại admin hoặc chỉ lưu vào Firestore.
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener(authResult -> {
                     String uid = authResult.getUser().getUid();

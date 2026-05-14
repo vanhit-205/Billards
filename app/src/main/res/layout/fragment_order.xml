@@ -32,12 +32,12 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_confirm_order"
+            style="@style/Widget.Billards.Button.Primary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Xác nhận đơn"
-            android:background="@drawable/custom_btn_login" />
+            android:text="Xác nhận đơn" />
     </LinearLayout>
 
 </LinearLayout>

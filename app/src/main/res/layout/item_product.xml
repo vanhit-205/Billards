@@ -70,7 +70,7 @@
                     android:focusable="true"
                     android:gravity="center"
                     android:includeFontPadding="false"
-                                        android:text="-"
+                    android:text="-"
                     android:textColor="#000000"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -112,17 +112,12 @@
             </LinearLayout>
         </LinearLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnOrder"
+            style="@style/Widget.Billards.Button.Primary"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@drawable/custom_btn_login"
-            app:backgroundTint="@null"
+            android:layout_height="wrap_content"
             android:text="Thêm vào giỏ"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:textSize="14sp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp" />
+            android:textSize="14sp" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

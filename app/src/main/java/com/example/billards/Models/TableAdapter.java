@@ -1,19 +1,21 @@
 package com.example.billards.Models;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.billards.R;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -27,7 +29,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
     private Context context;
 
     private Handler timeHandler = new Handler(Looper.getMainLooper());
-    private FirebaseFirestore db = FirebaseFirestore.getInstance(); // Khởi tạo dùng chung
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public TableAdapter(List<BillardTable> tableList, Context context){
         this.tableList = tableList;
@@ -42,7 +44,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
                 return;
             }
             if (snapshot != null && !snapshot.isEmpty()) {
-                notifyDataSetChanged(); // Refresh adapter on order changes
+                notifyDataSetChanged();
             }
         });
     }
@@ -64,21 +66,20 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
 
         if(table.getisPlaying()){
             holder.btnStart.setText("Tính tiền");
-            holder.btnStart.setBackgroundTintList(context.getResources().getColorStateList(android.R.color.holo_red_dark));
+            holder.btnStart.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.destructive)));
 
             holder.updateTimerRunnable = new Runnable() {
                 @Override
                 public void run() {
                     long diff = System.currentTimeMillis() - table.getStartTime();
                     holder.tvPlayTime.setText(formatTime(diff));
-                    timeHandler.postDelayed(this, 1000); // Lặp lại sau mỗi 1 giây
+                    timeHandler.postDelayed(this, 1000);
                 }
             };
             timeHandler.post(holder.updateTimerRunnable);
         } else {
             holder.btnStart.setText("Bắt đầu");
-            holder.btnStart.setBackgroundTintList(null);
-            holder.btnStart.setBackgroundResource(R.drawable.custom_btn_login);
+            holder.btnStart.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.blue_600)));
             holder.tvPlayTime.setText("00:00:00");
         }
 
@@ -103,10 +104,9 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
     private void payment(BillardTable table, DocumentReference tableRef){
         long diff = System.currentTimeMillis() - table.getStartTime();
         double minutes = diff / (1000.0 * 60);
-        double pricePerMinute = 50000.0 / 60.0; // 50k/h
+        double pricePerMinute = 50000.0 / 60.0;
         long timeTotal = (long) (minutes * pricePerMinute);
 
-        // Fetch orders for this table and calculate orders total
         db.collection("orders")
                 .whereEqualTo("tableID", table.getnumber())
                 .get()
@@ -138,10 +138,8 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
                                 Payment payment = new Payment(paymentRef.getId(), table.getnumber(), System.currentTimeMillis(), diff, total);
                                 paymentRef.set(payment)
                                         .addOnSuccessListener(aVoid -> {
-                                            // Reset table status
                                             tableRef.update("isPlaying", false, "startTime", 0)
                                                     .addOnSuccessListener(unused -> Toast.makeText(context, " Đã thanh toán và lưu hóa đơn", Toast.LENGTH_SHORT).show());
-                                            // Optionally, delete or mark orders as paid here
                                         })
                                         .addOnFailureListener(e -> {
                                             Toast.makeText(context, "Lỗi khi lưu hóa đơn: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -165,7 +163,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
     }
     public static class TableViewHolder extends RecyclerView.ViewHolder {
         TextView tvTableNumber, tvPlayTime;
-        Button btnStart;
+        MaterialButton btnStart;
 
         Runnable updateTimerRunnable;
 

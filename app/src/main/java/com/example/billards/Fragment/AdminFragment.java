@@ -1,10 +1,15 @@
 package com.example.billards.Fragment;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,11 +17,14 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.billards.Activities.LoginScreen;
 import com.example.billards.Models.UserSession;
 import com.example.billards.Models.Users;
 import com.example.billards.R;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class AdminFragment extends Fragment {
 
@@ -43,10 +51,9 @@ public class AdminFragment extends Fragment {
         tabLayout = view.findViewById(R.id.adminTabLayout);
         viewPager = view.findViewById(R.id.adminViewPager);
 
-        Users currentUser = UserSession.getInstance().getUser();
-        if (currentUser != null) {
-            tvAdminTitle.setText("Admin: " + currentUser.getName());
-        }
+        updateAdminName();
+
+        tvAdminTitle.setOnClickListener(v -> showPopupMenu());
 
         adapter = new AdminPagerAdapter(this);
         viewPager.setAdapter(adapter);
@@ -55,12 +62,93 @@ public class AdminFragment extends Fragment {
             switch (position) {
                 case 0:
                     tab.setText("Nhân viên");
+                    tab.setIcon(R.drawable.ic_users);
                     break;
                 case 1:
                     tab.setText("Thống kê");
+                    tab.setIcon(R.drawable.ic_bar_chart);
                     break;
             }
         }).attach();
+    }
+
+    private void updateAdminName() {
+        Users currentUser = UserSession.getInstance().getUser();
+        if (currentUser != null) {
+            tvAdminTitle.setText("Quản Trị Viên: " + currentUser.getName());
+        } else {
+            tvAdminTitle.setText("Quản Trị Viên");
+        }
+    }
+
+    private void showPopupMenu() {
+        PopupMenu popup = new PopupMenu(getContext(), tvAdminTitle);
+        popup.getMenuInflater().inflate(R.menu.account_menu, popup.getMenu());
+
+        popup.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.menu_edit_profile) {
+                openEditDialog();
+                return true;
+            } else if (itemId == R.id.menu_logout) {
+                handleLogout();
+                return true;
+            }
+            return false;
+        });
+        popup.show();
+    }
+
+    private void openEditDialog() {
+        Users currentUser = UserSession.getInstance().getUser();
+        if (currentUser == null) return;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Sửa thông tin");
+
+        final EditText input = new EditText(getContext());
+        input.setText(currentUser.getName());
+        builder.setView(input);
+
+        builder.setPositiveButton("Cập nhật", (dialog, which) -> {
+            String newName = input.getText().toString().trim();
+            if (!newName.isEmpty()) {
+                updateProfile(newName);
+            } else {
+                Toast.makeText(getContext(), "Tên không được để trống", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    private void updateProfile(String newName) {
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users").document(uid)
+                .update("name", newName)
+                .addOnSuccessListener(aVoid -> {
+                    Users currentUser = UserSession.getInstance().getUser();
+                    if (currentUser != null) {
+                        currentUser.setName(newName);
+                    }
+                    updateAdminName();
+                    Toast.makeText(getContext(), "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Cập nhật thất bại", Toast.LENGTH_SHORT).show());
+    }
+
+    private void handleLogout() {
+        FirebaseAuth.getInstance().signOut();
+        UserSession.getInstance().clear();
+        Intent intent = new Intent(getActivity(), LoginScreen.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        if (getActivity() != null) {
+            getActivity().finish();
+        }
     }
 
     private static class AdminPagerAdapter extends FragmentStateAdapter {
