@@ -104,6 +104,19 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
             View dialogView = LayoutInflater.from(context).inflate(R.layout.layout_payment_choice, null);
             AlertDialog dialog = new AlertDialog.Builder(context).setView(dialogView).create();
 
+            // Hiển thị thông tin hóa đơn
+            java.text.NumberFormat currencyFormat = java.text.NumberFormat.getInstance(new Locale("vi", "VN"));
+
+            TextView tvTableNumber = dialogView.findViewById(R.id.tvTableNumber);
+            TextView tvTimePrice = dialogView.findViewById(R.id.tvTimePrice);
+            TextView tvFoodPrice = dialogView.findViewById(R.id.tvFoodPrice);
+            TextView tvTotalAmount = dialogView.findViewById(R.id.tvTotalAmount);
+
+            tvTableNumber.setText("Bàn " + table.getnumber());
+            tvTimePrice.setText(currencyFormat.format(timePrice) + " đ");
+            tvFoodPrice.setText(currencyFormat.format(ordersTotal) + " đ");
+            tvTotalAmount.setText(currencyFormat.format(totalAmount) + " đ");
+
             dialogView.findViewById(R.id.btnCash).setOnClickListener(v -> {
                 processPayment(table, tableRef, diff, totalAmount, "cash", "completed");
                 dialog.dismiss();

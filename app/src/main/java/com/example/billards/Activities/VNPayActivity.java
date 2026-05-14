@@ -99,6 +99,12 @@ public class VNPayActivity extends AppCompatActivity {
         result.putExtra("vnp_TxnRef",       params.get("vnp_TxnRef"));
         result.putExtra("vnp_Amount",       params.get("vnp_Amount"));
 
+        // Truyền lại thông tin bàn để MainActivity có thể reset trạng thái
+        result.putExtra("TABLE_ID",      getIntent().getStringExtra("TABLE_ID"));
+        result.putExtra("TABLE_NUMBER",  getIntent().getIntExtra("TABLE_NUMBER", -1));
+        result.putExtra("TOTAL_AMOUNT",  getIntent().getLongExtra("TOTAL_AMOUNT", 0));
+        result.putExtra("DIFF",          getIntent().getLongExtra("DIFF", 0));
+
         // Áp dụng logic hiển thị thông báo như hướng dẫn
         if (signatureValid) {
             if ("00".equals(responseCode)) {
