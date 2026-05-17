@@ -28,16 +28,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="Theo Ngày"
-            android:textColor="@color/foreground" />
+            android:text="Ngày"
+            android:textColor="@color/foreground"
+            android:textSize="12sp" />
 
         <RadioButton
             android:id="@+id/rbMonth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:text="Theo Tháng"
-            android:textColor="@color/foreground" />
+            android:layout_marginStart="8dp"
+            android:text="Tháng"
+            android:textColor="@color/foreground"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:id="@+id/rbYear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Năm"
+            android:textColor="@color/foreground"
+            android:textSize="12sp" />
     </RadioGroup>
 
     <androidx.cardview.widget.CardView

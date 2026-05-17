@@ -62,6 +62,8 @@ public class RevenueStatisticsFragment extends Fragment {
                 loadRevenueData("day");
             } else if (checkedId == R.id.rbMonth) {
                 loadRevenueData("month");
+            } else if (checkedId == R.id.rbYear) {
+                loadRevenueData("year");
             }
         });
     }
@@ -91,7 +93,15 @@ public class RevenueStatisticsFragment extends Fragment {
             calendar.set(Calendar.SECOND, 0);
             calendar.set(Calendar.MILLISECOND, 0);
             startTime = calendar.getTimeInMillis();
+        } else if ("month".equals(type)) {
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            startTime = calendar.getTimeInMillis();
         } else {
+            calendar.set(Calendar.MONTH, Calendar.JANUARY);
             calendar.set(Calendar.DAY_OF_MONTH, 1);
             calendar.set(Calendar.HOUR_OF_DAY, 0);
             calendar.set(Calendar.MINUTE, 0);
@@ -118,8 +128,10 @@ public class RevenueStatisticsFragment extends Fragment {
                                 int key;
                                 if ("day".equals(type)) {
                                     key = itemCal.get(Calendar.HOUR_OF_DAY);
-                                } else {
+                                } else if ("month".equals(type)) {
                                     key = itemCal.get(Calendar.DAY_OF_MONTH);
+                                } else {
+                                    key = itemCal.get(Calendar.MONTH) + 1; // Month in Java Calendar is 0-11
                                 }
                                 chartData.put(key, chartData.getOrDefault(key, 0.0) + price);
                             }
@@ -142,13 +154,19 @@ public class RevenueStatisticsFragment extends Fragment {
                 entries.add(new BarEntry(i, val));
                 labels.add(i + "h");
             }
-        } else {
+        } else if ("month".equals(type)) {
             Calendar cal = Calendar.getInstance();
             int daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
             for (int i = 1; i <= daysInMonth; i++) {
                 float val = chartData.getOrDefault(i, 0.0).floatValue();
                 entries.add(new BarEntry(i - 1, val)); // entries use index 0-based for x
                 labels.add(String.valueOf(i));
+            }
+        } else {
+            for (int i = 1; i <= 12; i++) {
+                float val = chartData.getOrDefault(i, 0.0).floatValue();
+                entries.add(new BarEntry(i - 1, val));
+                labels.add("T" + i);
             }
         }
 

@@ -68,6 +68,10 @@ public class AdminFragment extends Fragment {
                     tab.setText("Thống kê");
                     tab.setIcon(R.drawable.ic_bar_chart);
                     break;
+                case 2:
+                    tab.setText("Lịch sử");
+                    tab.setIcon(R.drawable.payment);
+                    break;
             }
         }).attach();
     }
@@ -161,13 +165,15 @@ public class AdminFragment extends Fragment {
         public Fragment createFragment(int position) {
             if (position == 0) {
                 return new StaffManagementFragment();
+            } else if (position == 1) {
+                return new RevenueStatisticsFragment();
             }
-            return new RevenueStatisticsFragment();
+            return new PaymentHistoryFragment();
         }
 
         @Override
         public int getItemCount() {
-            return 2;
+            return 3;
         }
     }
 }

@@ -104,6 +104,8 @@ public class VNPayActivity extends AppCompatActivity {
         result.putExtra("TABLE_NUMBER",  getIntent().getIntExtra("TABLE_NUMBER", -1));
         result.putExtra("TOTAL_AMOUNT",  getIntent().getLongExtra("TOTAL_AMOUNT", 0));
         result.putExtra("DIFF",          getIntent().getLongExtra("DIFF", 0));
+        result.putExtra("TABLE_PRICE",   getIntent().getDoubleExtra("TABLE_PRICE", 0.0));
+        result.putExtra("FOOD_PRICE",    getIntent().getDoubleExtra("FOOD_PRICE", 0.0));
 
         // Áp dụng logic hiển thị thông báo như hướng dẫn
         if (signatureValid) {

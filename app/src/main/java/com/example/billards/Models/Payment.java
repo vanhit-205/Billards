@@ -8,6 +8,8 @@ public class Payment {
     private double price;
     private String paymentMethod; // "cash" or "vnpay"
     private String status;        // "completed", "pending", "failed"
+    private double tablePrice;
+    private double foodPrice;
 
     public Payment() {
         // Required for Firestore
@@ -21,6 +23,20 @@ public class Payment {
         this.price = price;
         this.paymentMethod = paymentMethod;
         this.status = status;
+        this.tablePrice = 0.0;
+        this.foodPrice = 0.0;
+    }
+
+    public Payment(String id, int table, long time, long timePlay, double price, String paymentMethod, String status, double tablePrice, double foodPrice) {
+        this.id = id;
+        this.table = table;
+        this.time = time;
+        this.timePlay = timePlay;
+        this.price = price;
+        this.paymentMethod = paymentMethod;
+        this.status = status;
+        this.tablePrice = tablePrice;
+        this.foodPrice = foodPrice;
     }
 
     public String getId() { return id; }
@@ -43,4 +59,10 @@ public class Payment {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public double getTablePrice() { return tablePrice; }
+    public void setTablePrice(double tablePrice) { this.tablePrice = tablePrice; }
+
+    public double getFoodPrice() { return foodPrice; }
+    public void setFoodPrice(double foodPrice) { this.foodPrice = foodPrice; }
 }

@@ -95,10 +95,11 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         long timePrice = (long) (minutes * (50000.0 / 60.0));
 
         db.collection("orders").whereEqualTo("tableID", table.getnumber()).get().addOnSuccessListener(querySnapshot -> {
-            long ordersTotal = 0;
+            long calculatedOrdersTotal = 0;
             for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                ordersTotal += doc.getLong("price") * doc.getLong("quantity");
+                calculatedOrdersTotal += doc.getLong("price") * doc.getLong("quantity");
             }
+            final long ordersTotal = calculatedOrdersTotal;
             long totalAmount = timePrice + ordersTotal;
 
             View dialogView = LayoutInflater.from(context).inflate(R.layout.layout_payment_choice, null);
@@ -118,7 +119,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
             tvTotalAmount.setText(currencyFormat.format(totalAmount) + " đ");
 
             dialogView.findViewById(R.id.btnCash).setOnClickListener(v -> {
-                processPayment(table, tableRef, diff, totalAmount, "cash", "completed");
+                processPayment(table, tableRef, diff, (double) timePrice, (double) ordersTotal, totalAmount, "cash", "completed");
                 dialog.dismiss();
             });
 
@@ -135,6 +136,8 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
                 intent.putExtra("TABLE_NUMBER", table.getnumber());
                 intent.putExtra("TOTAL_AMOUNT", totalAmount);
                 intent.putExtra("DIFF", diff);
+                intent.putExtra("TABLE_PRICE", (double) timePrice);
+                intent.putExtra("FOOD_PRICE", (double) ordersTotal);
 
                 if (context instanceof Activity) {
                     ((Activity) context).startActivityForResult(intent, 999);
@@ -145,9 +148,9 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         });
     }
 
-    public void processPayment(BillardTable table, DocumentReference tableRef, long diff, long total, String method, String status) {
+    public void processPayment(BillardTable table, DocumentReference tableRef, long diff, double tablePrice, double foodPrice, long total, String method, String status) {
         DocumentReference paymentRef = db.collection("payments").document();
-        Payment payment = new Payment(paymentRef.getId(), table.getnumber(), System.currentTimeMillis(), diff, total, method, status);
+        Payment payment = new Payment(paymentRef.getId(), table.getnumber(), System.currentTimeMillis(), diff, total, method, status, tablePrice, foodPrice);
         
         paymentRef.set(payment).addOnSuccessListener(aVoid -> {
             tableRef.update("isPlaying", false, "startTime", 0)

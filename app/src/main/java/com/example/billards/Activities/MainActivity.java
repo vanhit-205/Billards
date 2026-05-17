@@ -36,13 +36,15 @@ public class MainActivity extends AppCompatActivity {
             int tableNumber = data.getIntExtra("TABLE_NUMBER", -1);
             long totalAmount = data.getLongExtra("TOTAL_AMOUNT", 0);
             long diff = data.getLongExtra("DIFF", 0);
+            double tablePrice = data.getDoubleExtra("TABLE_PRICE", 0.0);
+            double foodPrice = data.getDoubleExtra("FOOD_PRICE", 0.0);
 
             if (tableId != null && tableNumber != -1) {
                 // Gọi logic reset bàn giống processPayment trong TableAdapter
                 DocumentReference tableRef = db.collection("table").document(tableId);
                 DocumentReference paymentRef = db.collection("payments").document();
                 Payment payment = new Payment(paymentRef.getId(), tableNumber,
-                        System.currentTimeMillis(), diff, totalAmount, "vnpay", "completed");
+                        System.currentTimeMillis(), diff, totalAmount, "vnpay", "completed", tablePrice, foodPrice);
 
                 paymentRef.set(payment).addOnSuccessListener(aVoid -> {
                     tableRef.update("isPlaying", false, "startTime", 0)
