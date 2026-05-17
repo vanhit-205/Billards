@@ -106,6 +106,28 @@
                 android:textSize="15sp" />
         </LinearLayout>
 
+        <!-- Xem/Hủy món đã gọi -->
+        <LinearLayout
+            android:id="@+id/layoutManageFood"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:id="@+id/btnManageFood"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Xem/Hủy món đã gọi"
+                android:textColor="@color/blue_600"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground" />
+        </LinearLayout>
+
         <!-- Đường kẻ ngang phân cách -->
         <View
             android:layout_width="match_parent"

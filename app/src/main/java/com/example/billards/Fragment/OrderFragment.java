@@ -67,6 +67,7 @@ public class OrderFragment extends Fragment {
         rvProducts = view.findViewById(R.id.rvProducts);
         tvTempTotal = view.findViewById(R.id.tv_temp_total);
         btnConfirmOrder = view.findViewById(R.id.btn_confirm_order);
+        Button btnClearCart = view.findViewById(R.id.btn_clear_cart);
 
         initData();
 
@@ -75,6 +76,23 @@ public class OrderFragment extends Fragment {
         rvProducts.setAdapter(productAdapter);
 
         btnConfirmOrder.setOnClickListener(v -> showTableSelectionDialog());
+
+        btnClearCart.setOnClickListener(v -> {
+            if (localCart.isEmpty()) {
+                Toast.makeText(getContext(), "Giỏ hàng đã trống rồi!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            new AlertDialog.Builder(getContext())
+                .setTitle("Xóa giỏ hàng")
+                .setMessage("Bạn có chắc chắn muốn xóa trống tất cả món trong giỏ hàng?")
+                .setPositiveButton("Xóa trống", (dialog, which) -> {
+                    localCart.clear();
+                    updateTotal();
+                    Toast.makeText(getContext(), "Đã xóa trống giỏ hàng!", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+        });
 
         updateTotal();
     }
@@ -153,6 +171,7 @@ public class OrderFragment extends Fragment {
         for (Orders order : localCart) {
             order.setTableID(tableID);
             DocumentReference ref = db.collection("orders").document();
+            order.setId(ref.getId());
             batch.set(ref, order);
         }
 
