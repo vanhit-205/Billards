@@ -48,7 +48,17 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.tvProductPrice.setText(formatter.format(product.getPrice()));
 
 
-        holder.imgProduct.setImageResource(product.getImageResId());
+        if (product.getImageBase64() != null && !product.getImageBase64().isEmpty()) {
+            try {
+                byte[] decodedString = android.util.Base64.decode(product.getImageBase64(), android.util.Base64.DEFAULT);
+                android.graphics.Bitmap decodedByte = android.graphics.BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                holder.imgProduct.setImageBitmap(decodedByte);
+            } catch (Exception e) {
+                holder.imgProduct.setImageResource(R.drawable.coca);
+            }
+        } else {
+            holder.imgProduct.setImageResource(product.getImageResId() != 0 ? product.getImageResId() : R.drawable.coca);
+        }
 
         holder.btnMinus.setOnClickListener(view -> {
             int quantity = Integer.parseInt(holder.tvQuantity.getText().toString());

@@ -30,6 +30,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -99,11 +101,48 @@ public class OrderFragment extends Fragment {
 
     private void initData() {
         productList = new ArrayList<>();
+        loadProductsFromFirestore();
+    }
 
-        productList.add(new Product("Bò húc", 15000, R.drawable.bohuc));
-        productList.add(new Product("Coca Cola", 10000, R.drawable.coca));
-        productList.add(new Product("Trà xanh 0 độ", 12000, R.drawable.khongdo));
-        productList.add(new Product("Mì tôm", 20000, R.drawable.mitom));
+    private void loadProductsFromFirestore() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("products").get()
+            .addOnSuccessListener(querySnapshot -> {
+                productList.clear();
+                if (querySnapshot.isEmpty()) {
+                    writeDefaultProductsToFirestore(db);
+                } else {
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        Product p = doc.toObject(Product.class);
+                        if (p != null) {
+                            p.setId(doc.getId());
+                            productList.add(p);
+                        }
+                    }
+                    if (productAdapter != null) {
+                        productAdapter.notifyDataSetChanged();
+                    }
+                }
+            })
+            .addOnFailureListener(e -> Toast.makeText(getContext(), "Lỗi tải sản phẩm: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    private void writeDefaultProductsToFirestore(FirebaseFirestore db) {
+        List<Product> defaults = new ArrayList<>();
+        defaults.add(new Product("Bò húc", 15000, R.drawable.bohuc));
+        defaults.add(new Product("Coca Cola", 10000, R.drawable.coca));
+        defaults.add(new Product("Trà xanh 0 độ", 12000, R.drawable.khongdo));
+        defaults.add(new Product("Mì tôm", 20000, R.drawable.mitom));
+
+        WriteBatch batch = db.batch();
+        for (Product p : defaults) {
+            DocumentReference ref = db.collection("products").document();
+            p.setId(ref.getId());
+            batch.set(ref, p);
+        }
+        batch.commit().addOnSuccessListener(aVoid -> {
+            loadProductsFromFirestore();
+        });
     }
 
     public void addToCart(Product product, int quantity) {
