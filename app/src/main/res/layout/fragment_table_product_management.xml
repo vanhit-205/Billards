@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background">
+
+    <!-- Top Tab Bar inside the fragment -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutTableProduct"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:tabIndicatorColor="@color/blue_600"
+        app:tabIndicatorHeight="3dp"
+        app:tabSelectedTextColor="@color/blue_600"
+        app:tabTextColor="@color/muted_foreground"
+        app:tabTextAppearance="@style/TabTextAppearance">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bàn chơi" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Món ăn / Đồ uống" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <!-- Main Container -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Table Management Section -->
+        <RelativeLayout
+            android:id="@+id/layoutTableManagement"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTables"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:clipToPadding="false" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabAddTable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="16dp"
+                android:src="@android:drawable/ic_input_add"
+                app:backgroundTint="@color/blue_600"
+                app:tint="@color/white"
+                android:contentDescription="Thêm bàn chơi mới" />
+        </RelativeLayout>
+
+        <!-- Product Management Section -->
+        <RelativeLayout
+            android:id="@+id/layoutProductManagement"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvProducts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:clipToPadding="false" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabAddProduct"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="16dp"
+                android:src="@android:drawable/ic_input_add"
+                app:backgroundTint="@color/blue_600"
+                app:tint="@color/white"
+                android:contentDescription="Thêm sản phẩm mới" />
+        </RelativeLayout>
+
+    </FrameLayout>
+</LinearLayout>

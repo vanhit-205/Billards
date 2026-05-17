@@ -172,10 +172,14 @@ public class AdminFragment extends Fragment {
                     tab.setIcon(R.drawable.ic_users);
                     break;
                 case 1:
+                    tab.setText("Bàn & Món");
+                    tab.setIcon(R.drawable.order);
+                    break;
+                case 2:
                     tab.setText("Thống kê");
                     tab.setIcon(R.drawable.ic_bar_chart);
                     break;
-                case 2:
+                case 3:
                     tab.setText("Lịch sử");
                     tab.setIcon(R.drawable.payment);
                     break;
@@ -318,17 +322,21 @@ public class AdminFragment extends Fragment {
         @NonNull
         @Override
         public Fragment createFragment(int position) {
-            if (position == 0) {
-                return new StaffManagementFragment();
-            } else if (position == 1) {
-                return new RevenueStatisticsFragment();
+            switch (position) {
+                case 0:
+                    return new StaffManagementFragment();
+                case 1:
+                    return new TableProductManagementFragment();
+                case 2:
+                    return new RevenueStatisticsFragment();
+                default:
+                    return new PaymentHistoryFragment();
             }
-            return new PaymentHistoryFragment();
         }
 
         @Override
         public int getItemCount() {
-            return 3;
+            return 4;
         }
     }
 }
