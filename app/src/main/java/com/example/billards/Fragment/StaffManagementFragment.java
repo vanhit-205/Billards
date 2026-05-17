@@ -53,7 +53,7 @@ public class StaffManagementFragment extends Fragment {
         btnAddStaff = view.findViewById(R.id.btnAddStaff);
 
         staffList = new ArrayList<>();
-        adapter = new StaffAdapter(staffList, this::showDeleteConfirmDialog);
+        adapter = new StaffAdapter(staffList, this::showDeleteConfirmDialog, this::showResetPasswordConfirmDialog);
         rvStaff.setLayoutManager(new LinearLayoutManager(getContext()));
         rvStaff.setAdapter(adapter);
 
@@ -129,5 +129,26 @@ public class StaffManagementFragment extends Fragment {
                 })
                 .setNegativeButton("Hủy", null)
                 .show();
+    }
+
+    private void showResetPasswordConfirmDialog(Users user) {
+        new AlertDialog.Builder(getContext())
+                .setTitle("Cấp lại mật khẩu")
+                .setMessage("Bạn có chắc chắn muốn gửi email khôi phục mật khẩu đến nhân viên " + user.getName() + " (" + user.getEmail() + ") không?")
+                .setPositiveButton("Gửi Email", (dialog, which) -> {
+                    sendResetPasswordEmail(user.getEmail());
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void sendResetPasswordEmail(String email) {
+        mAuth.sendPasswordResetEmail(email)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "Đã gửi email khôi phục mật khẩu thành công!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Lỗi gửi email: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
 }

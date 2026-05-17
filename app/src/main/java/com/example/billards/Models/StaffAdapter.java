@@ -17,14 +17,26 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
 
     private List<Users> staffList;
     private OnStaffDeleteListener deleteListener;
+    private OnStaffResetListener resetListener;
 
     public interface OnStaffDeleteListener {
         void onDelete(Users user);
     }
 
+    public interface OnStaffResetListener {
+        void onReset(Users user);
+    }
+
     public StaffAdapter(List<Users> staffList, OnStaffDeleteListener deleteListener) {
         this.staffList = staffList;
         this.deleteListener = deleteListener;
+        this.resetListener = null;
+    }
+
+    public StaffAdapter(List<Users> staffList, OnStaffDeleteListener deleteListener, OnStaffResetListener resetListener) {
+        this.staffList = staffList;
+        this.deleteListener = deleteListener;
+        this.resetListener = resetListener;
     }
 
     @NonNull
@@ -40,6 +52,15 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
         holder.tvName.setText(user.getName());
         holder.tvEmail.setText(user.getEmail());
         holder.btnDelete.setOnClickListener(v -> deleteListener.onDelete(user));
+        
+        if (holder.btnReset != null) {
+            if (resetListener != null) {
+                holder.btnReset.setVisibility(View.VISIBLE);
+                holder.btnReset.setOnClickListener(v -> resetListener.onReset(user));
+            } else {
+                holder.btnReset.setVisibility(View.GONE);
+            }
+        }
     }
 
     @Override
@@ -49,13 +70,14 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.StaffViewHol
 
     public static class StaffViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvEmail;
-        ImageButton btnDelete;
+        ImageButton btnDelete, btnReset;
 
         public StaffViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvStaffName);
             tvEmail = itemView.findViewById(R.id.tvStaffEmail);
             btnDelete = itemView.findViewById(R.id.btnDeleteStaff);
+            btnReset = itemView.findViewById(R.id.btnResetPassword);
         }
     }
 }
