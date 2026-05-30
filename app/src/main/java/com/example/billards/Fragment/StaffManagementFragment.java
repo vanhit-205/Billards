@@ -2,6 +2,7 @@ package com.example.billards.Fragment;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,10 @@ import com.example.billards.Models.Users;
 import com.example.billards.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -28,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StaffManagementFragment extends Fragment {
+
+    private static final String TAG = "StaffManagement";
 
     private RecyclerView rvStaff;
     private FloatingActionButton fabAddStaff;
@@ -106,17 +112,49 @@ public class StaffManagementFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Tạo tài khoản nhân viên bằng FirebaseAuth instance phụ
+     * để tránh đăng xuất admin khỏi phiên hiện tại.
+     * createUserWithEmailAndPassword() tự động đăng nhập user mới tạo,
+     * nên cần dùng instance riêng biệt.
+     */
     private void createStaffAccount(String name, String email, String password) {
-        mAuth.createUserWithEmailAndPassword(email, password)
+        // Lưu lại thông tin admin hiện tại
+        FirebaseUser adminUser = mAuth.getCurrentUser();
+
+        // Tạo FirebaseApp phụ để tạo tài khoản mà không ảnh hưởng đến phiên admin
+        FirebaseApp secondaryApp;
+        try {
+            secondaryApp = FirebaseApp.getInstance("staffCreator");
+        } catch (IllegalStateException e) {
+            FirebaseOptions options = FirebaseApp.getInstance().getOptions();
+            secondaryApp = FirebaseApp.initializeApp(requireContext(), options, "staffCreator");
+        }
+
+        FirebaseAuth secondaryAuth = FirebaseAuth.getInstance(secondaryApp);
+
+        secondaryAuth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener(authResult -> {
                     String uid = authResult.getUser().getUid();
                     Users newUser = new Users(uid, name, email, "staff");
+
+                    // Đăng xuất khỏi instance phụ ngay lập tức
+                    secondaryAuth.signOut();
+
                     db.collection("users").document(uid).set(newUser)
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(getContext(), "Đã thêm nhân viên thành công", Toast.LENGTH_SHORT).show();
+                                Log.d(TAG, "Staff account created: " + email + " (UID: " + uid + ")");
+                            })
+                            .addOnFailureListener(err -> {
+                                Log.e(TAG, "Failed to save staff to Firestore", err);
+                                Toast.makeText(getContext(), "Lỗi lưu thông tin: " + err.getMessage(), Toast.LENGTH_SHORT).show();
                             });
                 })
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to create staff account", e);
+                    Toast.makeText(getContext(), "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void showDeleteConfirmDialog(Users user) {
@@ -143,12 +181,25 @@ public class StaffManagementFragment extends Fragment {
     }
 
     private void sendResetPasswordEmail(String email) {
-        mAuth.sendPasswordResetEmail(email)
+        // Validate email trước khi gửi
+        if (TextUtils.isEmpty(email)) {
+            Log.e(TAG, "sendResetPasswordEmail: email is null or empty");
+            Toast.makeText(getContext(), "Lỗi: Email nhân viên không tồn tại trong hệ thống!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Log.d(TAG, "Sending password reset email to: " + email);
+
+        // Sử dụng FirebaseAuth default instance (không cần đăng nhập để gửi reset email)
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Đã gửi email khôi phục mật khẩu thành công!", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Password reset email sent successfully to: " + email);
+                    Toast.makeText(getContext(), "Đã gửi email khôi phục mật khẩu đến " + email + "!", Toast.LENGTH_LONG).show();
                 })
                 .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to send password reset email to: " + email, e);
                     Toast.makeText(getContext(), "Lỗi gửi email: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }
 }
+
