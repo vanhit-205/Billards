@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.billards.Models.UserSession;
 import com.example.billards.Models.Users;
 import com.example.billards.R;
+import com.example.billards.utils.SessionManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -43,7 +44,18 @@ public class LoginScreen extends AppCompatActivity {
         setContentView(R.layout.activity_login_screen);
         
         mAuth = FirebaseAuth.getInstance();
-        
+
+        // === AUTO-LOGIN: Kiểm tra session đã lưu ===
+        if (SessionManager.isLoggedIn(this)) {
+            Users cachedUser = SessionManager.loadSession(this);
+            if (cachedUser != null) {
+                UserSession.getInstance().setUser(cachedUser);
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return;
+            }
+        }
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -138,6 +150,8 @@ public class LoginScreen extends AppCompatActivity {
             }
             
             UserSession.getInstance().setUser(userModel);
+            // Lưu session vào cache để không cần đăng nhập lại
+            SessionManager.saveSession(this, userModel);
             
             Intent intent = new Intent(LoginScreen.this, MainActivity.class);
             startActivity(intent);

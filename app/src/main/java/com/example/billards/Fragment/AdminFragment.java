@@ -23,6 +23,7 @@ import com.example.billards.Models.Users;
 import com.example.billards.R;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.example.billards.utils.SessionManager;
 import com.google.firebase.auth.FirebaseAuth;
 import android.net.Uri;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -209,6 +210,7 @@ public class AdminFragment extends Fragment {
     private void handleLogout() {
         FirebaseAuth.getInstance().signOut();
         UserSession.getInstance().clear();
+        SessionManager.clearSession(getContext());
         Intent intent = new Intent(getActivity(), LoginScreen.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
