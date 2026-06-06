@@ -66,7 +66,7 @@ public class PaymentFragment extends Fragment {
     }
 
     private void loadDataFromFirestore() {
-        db.collection("table").addSnapshotListener((value, error) -> {
+        db.collection("table").orderBy("number").addSnapshotListener((value, error) -> {
             if (error != null) {
                 Log.e("DEBUG_FIRESTORE", "Lỗi: " + error.getMessage());
                 return;

@@ -173,6 +173,7 @@ public class OrderFragment extends Fragment {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("table")
             .whereEqualTo("isPlaying", true)
+            .orderBy("number")
             .get()
             .addOnSuccessListener(querySnapshot -> {
                 List<BillardTable> tables = querySnapshot.toObjects(BillardTable.class);
