@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.example.billards.Models.BillardTable;
 import com.example.billards.Models.Product;
@@ -38,6 +39,7 @@ import java.util.Locale;
 public class OrderFragment extends Fragment {
 
     private RecyclerView rvProducts;
+    private ProgressBar progressBar;
     private ProductAdapter productAdapter;
     private List<Product> productList;
     private List<Orders> localCart = new ArrayList<>();
@@ -67,6 +69,7 @@ public class OrderFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         rvProducts = view.findViewById(R.id.rvProducts);
+        progressBar = view.findViewById(R.id.progressBar);
         tvTempTotal = view.findViewById(R.id.tv_temp_total);
         btnConfirmOrder = view.findViewById(R.id.btn_confirm_order);
         Button btnClearCart = view.findViewById(R.id.btn_clear_cart);
@@ -122,6 +125,8 @@ public class OrderFragment extends Fragment {
                     if (productAdapter != null) {
                         productAdapter.notifyDataSetChanged();
                     }
+                    progressBar.setVisibility(View.GONE);
+                    rvProducts.setVisibility(View.VISIBLE);
                 }
             })
             .addOnFailureListener(e -> Toast.makeText(getContext(), "Lỗi tải sản phẩm: " + e.getMessage(), Toast.LENGTH_SHORT).show());

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -34,6 +35,7 @@ public class LoginScreen extends AppCompatActivity {
     EditText edtuser;
     EditText edtpass;
     Button btnlogin;
+    ProgressBar progressBar;
     private FirebaseAuth mAuth;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -65,6 +67,7 @@ public class LoginScreen extends AppCompatActivity {
         edtuser = findViewById(R.id.edtemail);
         edtpass = findViewById(R.id.edtpass);
         btnlogin = findViewById(R.id.btnlogin);
+        progressBar = findViewById(R.id.progressBar);
 
         btnlogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,6 +84,8 @@ public class LoginScreen extends AppCompatActivity {
     }
 
     private void signIn(String email, String password) {
+        progressBar.setVisibility(View.VISIBLE);
+        btnlogin.setEnabled(false);
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -95,6 +100,8 @@ public class LoginScreen extends AppCompatActivity {
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
                             Toast.makeText(LoginScreen.this, "Đăng nhập thất bại: " + task.getException().getMessage(),
                                     Toast.LENGTH_SHORT).show();
+                            progressBar.setVisibility(View.GONE);
+                            btnlogin.setEnabled(true);
                         }
                     }
                 });

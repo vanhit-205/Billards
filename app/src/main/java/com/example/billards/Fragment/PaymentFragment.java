@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,7 @@ import java.util.List;
 public class PaymentFragment extends Fragment {
 
     private RecyclerView rvTablesPayment;
+    private ProgressBar progressBar;
     private TableAdapter adapter;
     private List<BillardTable> tableList;
     private FirebaseFirestore db;
@@ -46,6 +48,7 @@ public class PaymentFragment extends Fragment {
 
 
         rvTablesPayment = view.findViewById(R.id.rvTablesPayment);
+        progressBar = view.findViewById(R.id.progressBar);
 
 
         tableList = new ArrayList<>();
@@ -82,6 +85,8 @@ public class PaymentFragment extends Fragment {
                 }
                 Log.d("DEBUG_FIRESTORE", "Số lượng bàn: " + tableList.size());
                 adapter.notifyDataSetChanged();
+                progressBar.setVisibility(View.GONE);
+                rvTablesPayment.setVisibility(View.VISIBLE);
             }
         });
     }

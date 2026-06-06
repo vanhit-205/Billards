@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -42,6 +43,7 @@ public class StaffManagementFragment extends Fragment {
     private List<Users> staffList;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,6 +57,7 @@ public class StaffManagementFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         rvStaff = view.findViewById(R.id.rvStaff);
+        progressBar = view.findViewById(R.id.progressBar);
         fabAddStaff = view.findViewById(R.id.fabAddStaff);
         btnAddStaff = view.findViewById(R.id.btnAddStaff);
 
@@ -83,6 +86,8 @@ public class StaffManagementFragment extends Fragment {
                             staffList.add(user);
                         }
                         adapter.notifyDataSetChanged();
+                        progressBar.setVisibility(View.GONE);
+                        rvStaff.setVisibility(View.VISIBLE);
                     }
                 });
     }

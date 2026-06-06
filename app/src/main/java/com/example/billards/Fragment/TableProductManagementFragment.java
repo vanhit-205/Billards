@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -55,6 +56,7 @@ public class TableProductManagementFragment extends Fragment {
     private List<Product> productList;
 
     private FirebaseFirestore db;
+    private ProgressBar progressBarTable, progressBarProduct;
 
     // Image Picker Constants & State
     private static final int PICK_IMAGE_REQUEST = 2020;
@@ -116,6 +118,7 @@ public class TableProductManagementFragment extends Fragment {
         });
         rvTables.setLayoutManager(new LinearLayoutManager(getContext()));
         rvTables.setAdapter(tableAdapter);
+        progressBarTable = view.findViewById(R.id.progressBarTable);
 
         // Table FloatingActionButton (Thêm Bàn)
         view.findViewById(R.id.fabAddTable).setOnClickListener(v -> showAddTableDialog());
@@ -136,6 +139,7 @@ public class TableProductManagementFragment extends Fragment {
         });
         rvProducts.setLayoutManager(new LinearLayoutManager(getContext()));
         rvProducts.setAdapter(productAdapter);
+        progressBarProduct = view.findViewById(R.id.progressBarProduct);
 
         // Product FloatingActionButton (Thêm Món)
         view.findViewById(R.id.fabAddProduct).setOnClickListener(v -> showAddProductDialog());
@@ -164,6 +168,8 @@ public class TableProductManagementFragment extends Fragment {
                             }
                         }
                         tableAdapter.notifyDataSetChanged();
+                        progressBarTable.setVisibility(View.GONE);
+                        rvTables.setVisibility(View.VISIBLE);
                     }
                 });
     }
@@ -182,6 +188,8 @@ public class TableProductManagementFragment extends Fragment {
                             }
                         }
                         productAdapter.notifyDataSetChanged();
+                        progressBarProduct.setVisibility(View.GONE);
+                        rvProducts.setVisibility(View.VISIBLE);
                     }
                 });
     }

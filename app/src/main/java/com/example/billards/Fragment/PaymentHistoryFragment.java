@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,7 @@ import java.util.List;
 public class PaymentHistoryFragment extends Fragment {
 
     private RecyclerView rvPaymentHistory;
+    private ProgressBar progressBar;
     private TextView tvEmptyHistory;
     private PaymentHistoryAdapter adapter;
     private List<Payment> paymentList;
@@ -46,6 +48,7 @@ public class PaymentHistoryFragment extends Fragment {
 
         rvPaymentHistory = view.findViewById(R.id.rvPaymentHistory);
         tvEmptyHistory = view.findViewById(R.id.tvEmptyHistory);
+        progressBar = view.findViewById(R.id.progressBar);
 
         paymentList = new ArrayList<>();
         rvPaymentHistory.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -71,6 +74,8 @@ public class PaymentHistoryFragment extends Fragment {
                             Payment payment = parsePayment(doc);
                             paymentList.add(payment);
                         }
+
+                        progressBar.setVisibility(View.GONE);
 
                         if (paymentList.isEmpty()) {
                             tvEmptyHistory.setVisibility(View.VISIBLE);

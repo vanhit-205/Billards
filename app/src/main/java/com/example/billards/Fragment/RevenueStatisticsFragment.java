@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -36,6 +37,7 @@ public class RevenueStatisticsFragment extends Fragment {
     private RadioGroup rgFilter;
     private TextView tvTotalRevenue;
     private BarChart barChart;
+    private ProgressBar progressBar;
     private FirebaseFirestore db;
     private double totalRevenue = 0;
     private Map<Integer, Double> chartData = new HashMap<>();
@@ -53,6 +55,7 @@ public class RevenueStatisticsFragment extends Fragment {
         rgFilter = view.findViewById(R.id.rgFilter);
         tvTotalRevenue = view.findViewById(R.id.tvTotalRevenue);
         barChart = view.findViewById(R.id.barChart);
+        progressBar = view.findViewById(R.id.progressBar);
 
         setupChart();
         loadRevenueData("day");
@@ -136,7 +139,9 @@ public class RevenueStatisticsFragment extends Fragment {
                                 chartData.put(key, chartData.getOrDefault(key, 0.0) + price);
                             }
                         }
-                        updateUI(type);
+                    progressBar.setVisibility(View.GONE);
+                    barChart.setVisibility(View.VISIBLE);
+                    updateUI(type);
                     }
                 });
     }
